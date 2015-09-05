@@ -1,7 +1,13 @@
+var crypto = require("crypto");
+
 function KeyTransformer () {
 	throw "KeyTransformer should be called statically";
 }
 
+/**
+ * Transformation object that holds the available transformations
+ * @type {Object}
+ */
 KeyTransformer.transforms = {
 	"none": function (key) {
 		return key;
@@ -23,8 +29,22 @@ KeyTransformer.transforms = {
 	}
 };
 
+/**
+ * Gets the list of available transforms
+ * @return {Array}
+ */
+KeyTransformer.getAvailableTransforms = function () {
+	return Object.getKeys(KeyTransformer.transforms);
+};
+
+/**
+ * Transforms the key using the specified key transforms.
+ * @param  {String} The key to transform 	
+ * @param  {Array}
+ * @return {String}
+ */
 KeyTransformer.transformKey = function (key, transformationType) {
-	if (typeof transformationType != "object") {
+	if (!transformationType instanceof Array) {
 		transformationType = [transformationType];
 	}
 	var currkey = key;
@@ -35,6 +55,12 @@ KeyTransformer.transformKey = function (key, transformationType) {
 	return currkey;
 };
 
+/**
+ * Returns a hex encoded hash of the hashing algorithm
+ * @param  {String} The hashing algorithm
+ * @param  {String} String to hash
+ * @return {String} Hex string representing the hash
+ */
 function dehash (algo, key) {
 	var hasher = crypto.createHash(algo);
 	if (key instanceof Buffer) {

@@ -1,0 +1,28 @@
+{
+  "name": "a858decrypt",
+  "version": "0.0.0",
+  "description": "A library and CLI program designed to test keys and encryption methods against posts made by A858",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "decrypt",
+    "a858",
+    "reddit",
+    "posts"
+  ],
+  "author": "Tom Caserta <tom@caserta.co.uk> (http://tom.caserta.co.uk/)",
+  "license": "MIT",
+  "bin": {
+    "massdecrypt": "./cli/decrypt.js",
+    "dumpdecrypt": "./cli/dumpdecrypt.js",
+    "ivhelper": "./cli/ivhelper.js",
+    "searchposts": "./cli/searchposts.js",
+    "transformkeys": "./cli/transformkeys.js",
+    "updateposts": "./cli/update.js"
+  },
+  "bugs": {
+    "url": "https://github.com/TomCaserta/A858Decrypter/issues"
+  }
+}

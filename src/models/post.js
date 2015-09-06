@@ -12,6 +12,7 @@ function Post (name, time, body, url) {
 	this.time = time;
 	this.body = Utils.sanitizeData(body);
 	this.url = url;
+	this._isHex = Utils.isHex(this.body);
 }
 
 /**
@@ -55,7 +56,7 @@ Post.prototype.getHexBuffer = function () {
  * @return {Boolean} 
  */
 Post.prototype.isHex = function () {
-	return Utils.isHex(this.body);
+	return this._isHex;
 };
 
 /**
@@ -65,7 +66,9 @@ Post.prototype.isHex = function () {
  * @return {Post} 
  */
 Post.prototype.preprocess = function (preProcessors, decrypterAPI) {
-	return PostPreprocessor.preprocess(this, preProcessors, decrypterAPI);
+	var me = PostPreprocessor.preprocess(this, preProcessors, decrypterAPI);
+	me._isHex = Utils.isHex(me.body);
+	return me;
 };
 
 /**

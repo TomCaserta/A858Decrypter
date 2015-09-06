@@ -3,6 +3,7 @@
  */
 function PostList () {
 	this._posts = [];
+	this._hexLength = 0;
 }
 
 /**
@@ -12,6 +13,9 @@ function PostList () {
  */
 PostList.prototype.push = function (post) {
 	this._posts.push(post);
+	if (post.isHex()) {
+		this._hexLength++;
+	}
 };
 
 /** 
@@ -21,6 +25,14 @@ PostList.prototype.push = function (post) {
 PostList.prototype.getLength = function () {
 	return this._posts.length;
 };
+
+/**
+ * Returns the number of posts in this list that is hex
+ * @return {integer}
+ */
+PostList.prototype.getHexLength = function () {
+	return this._hexLength;
+}
 
 /**
  * Gets the Post object from the PostList
@@ -50,8 +62,15 @@ PostList.prototype.forEach = function (callback) {
  * @return {null}
  */
 PostList.prototype.preprocess = function (preprocessNamesArray, decrypterAPI) {
+	this._hexLength = 0;
+	var self = this;
 	this.forEach(function (post){ 
 		post.preprocess(preprocessNamesArray, decrypterAPI);
+
+		// Check if the post is now hex
+		if (post.isHex()) {
+			self._hexLength++;
+		}
 	});
 };
 

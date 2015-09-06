@@ -1,7 +1,6 @@
 var crypto = require("crypto");
 var events = require('events');
-var events = require('events');
-var Parallel = require("paralleljs");
+//var Parallel = require("paralleljs");
 
 /**
  * Creates a new Decrypter instance that can be used to

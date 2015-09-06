@@ -10,7 +10,7 @@ var Utils = require("../utils/common.js");
 function Post (name, time, body, url) {
 	this.name = name;
 	this.time = time;
-	this.body = this._sanitizeBody(body);
+	this.body = Utils.sanitizeData(body);
 	this.url = url;
 }
 
@@ -40,6 +40,17 @@ Post.fromCSV = function (csvData) {
 };
 
 /**
+ * Retrieves a buffer of the hex encoded data in the post
+ * @return {Buffer}
+ */
+Post.prototype.getHexBuffer = function () {
+	if (!this.isHex()) {
+		throw "Post does not contain hex data";
+	}
+	return new Buffer(this.body, "hex");
+}
+
+/**
  * Returns true if the body of the post is hex
  * @return {Boolean} 
  */
@@ -64,7 +75,7 @@ Post.prototype.preprocess = function (preProcessors, decrypterAPI) {
 Post.prototype.getStandardDeviation = function () {
 	// If the body is hex then we should decode the hex as bytes
 	if (this.isHex()) {
-		return Utils.getStandardDeviation(new Buffer(this.body, "hex");
+		return Utils.getStandardDeviation(new Buffer(this.body, "hex"));
 	}
 
 	// If not just use the utf8 representation

@@ -24,5 +24,8 @@
   },
   "bugs": {
     "url": "https://github.com/TomCaserta/A858Decrypter/issues"
+  },
+  "dependencies": {
+    "promise": "^7.0.4"
   }
 }

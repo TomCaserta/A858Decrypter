@@ -17,7 +17,7 @@ Utils.sanitizeData = function (body) {
  * @return {Boolean} 
  */
 Utils.isHex = function (hex) {
-	if (hex instanceof buffer) {
+	if (hex instanceof Buffer) {
 		hex = buffer.toString("ascii");
 	}
 	return /[0-9A-F]/i.test(hex);
@@ -31,11 +31,11 @@ Utils.scoreRelevance = function (hex) {
 
 /**
  * Creates a histogram from an input, the returned object is charCode => frequency (key=>value)
- * @param  {string or Buffer} The input data to create a histogram for
+ * @param  {String or Buffer} The input data to create a histogram for
  * @return {Object} An object displaying how common each character is.
  */
 Utils.histogram = function (hex) {	
-	if (hex !instanceof Buffer) {
+	if (!hex instanceof Buffer) {
 		hex = new Buffer(hex, "ascii");
 	}
 	var result = {};
@@ -56,7 +56,7 @@ Utils.histogram = function (hex) {
  * @return {Number} The standard deviation of the data
  */
 Utils.getStandardDeviation = function (hex, histogram) {
-	if (hex !instanceof Buffer) {
+	if (!hex instanceof Buffer) {
 		hex = new Buffer(hex, "ascii");
 	}
 

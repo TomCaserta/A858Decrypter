@@ -1,3 +1,6 @@
+var ProgressBar = require("progress");
+var Promise = require("promise");
+
 function Utils () {
 	throw "Utils is a static object";
 }
@@ -23,10 +26,79 @@ Utils.isHex = function (hex) {
 	return /[0-9A-F]/i.test(hex);
 };
 
+/**
+ * Scores the decrypted response based on a number of factors of
+ * which is undefined yet because its not implemented
+ * @param  {[type]}
+ * @return {[type]}
+ */
 Utils.scoreRelevance = function (hex) {
 	if (!hex instanceof Buffer) {
-
+		// TODO: Score Relevance Function
 	}
+};
+
+/**
+ * Creates a progress bar with commonly required parameters
+ * @param  {String} Progress bar name
+ * @param  {Integer} Total objects to complete
+ * @return {ProgressBar}
+ */
+Utils.createProgressBar = function (displayName, totalLength) {
+	//console.log(displayName, totalLength);
+	return new ProgressBar(pad(displayName, 30, " ")+' :bar :etaS ', { 
+		total: totalLength,
+		complete: "█",
+		incomplete: "░",
+		width: 80
+	});
+};
+
+/**
+ * Reads a file, outputs a progress bar and buffer
+ * @param  {String} The file name
+ * @param  {String} The display name of the progress bar
+ * @param  {Stream?} Pipes the output to another stream
+ * @return {Promise}
+ */
+Utils.readFileWithProgress = function (fileName, displayName, pipeTo) {
+	return new Promise(function (resolve, reject) { 
+		//console.log("Promise called");
+		statFile(fileName).then(function (fileStats) {
+			var size = fileStats["size"];
+			//console.log("Reading progress");
+			var progressBar = createProgressBar(displayName, size);
+			progressBar.tick(0);
+			var file = "";
+			var readStream = fs.createReadStream(fileName);
+			if (pipeTo != null) {
+				readStream = readStream.pipe(pipeTo());
+			}
+			readStream.on("data", function(chunk) {
+				progressBar.tick(chunk.length);
+				file += chunk;
+			}).on("end", function() {
+				resolve(file);
+			}).on("error", function (error) { 
+				reject(error);
+			});
+		}, function (err) { 
+			reject(err);
+		});
+	});
+}
+
+/**
+ * Pads the text up to the specified width 
+ * @param  {String} Item to padd
+ * @param  {Integer} Amount to padd
+ * @param  {String} Character to padd with defaults to 0
+ * @return {String}
+ */
+Utils.pad = function (text, width, paddCharacter) {
+  paddCharacter = paddCharacter || '0';
+  text = text + '';
+  return text.length >= width ? text : new Array(width - text.length + 1).join(paddCharacter) + text;
 };
 
 /**

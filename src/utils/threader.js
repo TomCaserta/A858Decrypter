@@ -87,7 +87,7 @@ Threader.prototype.sendWork = function (work) {
 Threader.prototype.disconnectAll = function () {
 	this._connected = false;
 	for (var thread = 0; thread < this._threads.length; thread++) {
-		this._threads.disconnect();
+		this._threads[thread].disconnect();
 	}
 };
 

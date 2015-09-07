@@ -18,6 +18,21 @@ PostList.prototype.push = function (post) {
 	}
 };
 
+/**
+ * Adds a Post object into the post list.
+ * @param  {Post}
+ * @return {null}
+ */
+PostList.prototype.pushAll = function (arrayPosts) {
+	for (var i = 0; i < arrayPosts.length; i++) {
+		var post = arrayPosts[i];
+		this._posts.push(post)
+		if (post.isHex()) {
+			this._hexLength++;
+		}
+	}
+};
+
 /** 
  * Returns the length of the PostList
  * @return {integer}
@@ -51,7 +66,7 @@ PostList.prototype.get = function (i) {
  */
 PostList.prototype.forEach = function (callback) {
 	for (var pi = 0; pi < this.getLength(); pi++) {
-		callback(this.get(i), i);
+		callback(this.get(pi), pi);
 	}	
 };
 
@@ -102,3 +117,5 @@ PostList.prototype.find = function (options) {
 	});
 	return posts;
 };
+
+module.exports = PostList;

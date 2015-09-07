@@ -1,6 +1,7 @@
 var crypto = require("crypto");
 var events = require('events');
-var Threader = require('./utils/threader.js')
+var Threader = require('./utils/threader.js');
+var util   = require('util');
 //var Parallel = require("paralleljs");
 
 /**
@@ -11,20 +12,21 @@ var Threader = require('./utils/threader.js')
  * @param {PostList} The posts that should be decrypted
  * @param {array} The cipher modes to use for decryption
  */
-function Decrypter (keys, posts, modes, workers) {
+function Decrypter (posts, keys, modes, workers) {
   	events.EventEmitter.call(this);
   	// TODO: Make immutable.
 	this.keys = keys;
 	this.posts = posts;
 	this.modes = modes;
-	this.threader = new Threader(workers, "./../workers/decrypt.js");
+	this.threader = new Threader(workers, "./src/workers/decrypt.js");
 
 	// Private vars!
 	this._amountToProcess = 0;
 	this._isDecrypting = false;
 	this._amountDecrypted = 0;
-	this._paralell = new Paralell();
 }
+
+util.inherits(Decrypter, events.EventEmitter);
 
 /**
  * Calculates the amount of decryptions needed to process
@@ -34,7 +36,11 @@ function Decrypter (keys, posts, modes, workers) {
  * @return {int} The amount of decryptions to process
  */
 Decrypter.prototype._calculateProcessAmount = function () {
-	this._amountToProcess = this.posts.getHexLength() * this.keys.getLength() * this.modes.length;
+	console.log(this.keys.getLength());
+	console.log(this.posts.getHexLength());
+	console.log(this.modes.length);
+	this._amountToProcess = (this.posts.getHexLength() * this.keys.getLength()) * this.modes.length;
+	console.log(this._amountToProcess);
 	return this._amountToProcess;
 };
 
@@ -70,7 +76,7 @@ Decrypter.prototype.decrypt = function () {
 		var self = this;
 		this.posts.forEach(function (post) {
 			if (post.isHex()) {
-				self._decryptPostWithKeys(currentPost, self.keys, self.modes);
+				self._decryptPostWithKeys(post, self.keys, self.modes);
 			}
 		});
 	}
@@ -91,7 +97,7 @@ Decrypter.prototype._decryptPostWithKeys = function (post, keys, modes) {
 	// Keys loop
 	var self = this;
 	this.keys.forEach(function (key) { 
-		this._decryptPostWithModes(post, key, modes);
+		self._decryptPostWithModes(post, key, modes);
 	});
 };
 
@@ -132,10 +138,12 @@ Decrypter.prototype._reset = function () {
  */
 Decrypter.prototype._checkIfAllDecrypted = function () {
 	// Check if the decryption has finished
-	if (this._amountDecrypted == (this._amountToProcess - 1)) {
+	//console.log(this._amountDecrypted , this._amountToProcess);
+	if (this._amountDecrypted == this._amountToProcess) {
 		// Emit our done event and reset.
 		this.emit("done");
 		this.threader.disconnectAll();
+		//this.removeAllListeners();
 		this._reset();
 		return true;
 	}
@@ -153,13 +161,12 @@ Decrypter.prototype._checkIfAllDecrypted = function () {
  */
 Decrypter.prototype._decryptPost = function (post, key, mode) {
 	// Actual Decryption
-	this._amountToProcess++;
 	if (post.isHex()) { // Final check before we send it to the decrypter
 		var work = {
 			task: "decrypt",
 			buffer: new Buffer(post.body,"hex"),
 			key: key,
-			mode: mode
+			algorithm: mode
 		};
 		var self = this;
 		this.threader.sendWork(work).then(function (decryptedResponse) { 

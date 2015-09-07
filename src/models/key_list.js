@@ -38,8 +38,8 @@ KeyList.prototype.get = function (i) {
  * @return {null}
  */
 KeyList.prototype.forEach = function (callback) {
-	for (var pi = 0; pi < this.getLength(); pi++) {
-		callback(this.get(i), i);
+	for (var ki = 0; ki < this.getLength(); ki++) {
+		callback(this.get(ki), ki);
 	}	
 };
 
@@ -53,3 +53,5 @@ KeyList.prototype.transform = function (transformers) {
 		key.transform(transformers);
 	});
 };
+
+module.exports = KeyList;

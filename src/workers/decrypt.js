@@ -11,7 +11,6 @@ var crypto = require("crypto");
 function decrypt (buffer, key, algorithm, iv) {
 	buffer = new Buffer(buffer);
 	var decipher;
-	//console.log(hex, key, ivmaybe);
 	if (!iv) {
 		 decipher = crypto.createDecipher(algorithm, key);
 	}
@@ -25,6 +24,7 @@ function decrypt (buffer, key, algorithm, iv) {
 }
 
 process.on('message',function(msg){
+ 			//	console.log(msg);
 	//console.log("Got task", msg);
  	switch (msg.task) {
  		case "decrypt":

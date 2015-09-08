@@ -11,11 +11,15 @@ var crypto = require("crypto");
 function decrypt (buffer, key, algorithm, iv) {
 	buffer = new Buffer(buffer);
 	var decipher;
+	if (key instanceof Array) {
+		key = new Buffer(key);
+	//	iv = "!buffer!";
+	}
 	if (!iv) {
 		 decipher = crypto.createDecipher(algorithm, key);
 	}
 	else {
-		decipher = crypto.createDecipheriv(algorithm, key, iv);
+		decipher = crypto.createDecipheriv(algorithm, key, (iv != "!buffer!" ? iv : "\00\00\00\00\00\00\00\00"));
 	}
 	var decrypted = decipher.update(buffer, null, "hex");
 
@@ -36,6 +40,7 @@ process.on('message',function(msg){
  			var identifier = msg.identifier;
  			try {
  				var decryptedData = decrypt(post, key, algorithm, iv);
+ 			//	console.log("Success");
  				process.send({
  					success: true,
  					identifier: identifier,
@@ -43,6 +48,7 @@ process.on('message',function(msg){
  				});
  			}
  			catch (e) {
+ 			//	console.log("FAIL");
  				process.send({
  					success: false,
  					identifier: identifier,

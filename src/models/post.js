@@ -1,4 +1,5 @@
 var Utils = require("../utils/common.js");
+var PostPreprocessor = require("../utils/post_preprocessor.js");
 
 /**
  * Creates a new post object
@@ -37,7 +38,7 @@ Post.fromCSV = function (csvData) {
 			url: csvData[3]
 		};
 	}	
-	return new Post(csvData.name, csvData.time, csvData.body, csvData.url);
+	return new Post(csvData.title, csvData.time, csvData.body, csvData.url);
 };
 
 /**

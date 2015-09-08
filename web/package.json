@@ -1,0 +1,24 @@
+{
+  "main": "index.html",
+  "name": "a858decrypter",
+  "description": "A GUI Decryption Utility for Node Webkit",
+  "version": "0.1.0",
+  "keywords": [
+    "a858decrypter",
+    "decrypt",
+    "a858"
+  ],
+  "window": {
+    "title": "A858 Decrypter Tool",
+    "toolbar": false,
+    "frame": false,
+    "width": 800,
+    "height": 500,
+    "position": "center",
+    "transparent": false
+  },
+  "dependencies": {
+    "laravel-elixir": "^3.2.6",
+    "react": "^0.13.3"
+  }
+}

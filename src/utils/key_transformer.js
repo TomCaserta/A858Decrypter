@@ -33,8 +33,24 @@ KeyTransformer.transforms = {
  * Gets the list of available transforms
  * @return {Array}
  */
+KeyTransformer.getTransforms = function () {
+	return Object.keys(KeyTransformer.transforms); 
+}
+
+/**
+ * Checks if the transformer has a transformer
+ * @return {Boolean}
+ */
+KeyTransformer.hasTransform = function (transformName) {
+	return KeyTransformer.transforms.hasOwnProperty(transformName);
+}
+
+/**
+ * Gets the list of available transforms
+ * @return {Array}
+ */
 KeyTransformer.getAvailableTransforms = function () {
-	return Object.getKeys(KeyTransformer.transforms);
+	return Object.keys(KeyTransformer.transforms);
 };
 
 /**

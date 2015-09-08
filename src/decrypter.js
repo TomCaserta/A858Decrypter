@@ -36,11 +36,11 @@ util.inherits(Decrypter, events.EventEmitter);
  * @return {int} The amount of decryptions to process
  */
 Decrypter.prototype._calculateProcessAmount = function () {
-	console.log(this.keys.getLength());
-	console.log(this.posts.getHexLength());
-	console.log(this.modes.length);
+//	console.log(this.keys.getLength());
+	//console.log(this.posts.getHexLength());
+//	console.log(this.modes.length);
 	this._amountToProcess = (this.posts.getHexLength() * this.keys.getLength()) * this.modes.length;
-	console.log(this._amountToProcess);
+//	console.log(this._amountToProcess);
 	return this._amountToProcess;
 };
 
@@ -161,7 +161,11 @@ Decrypter.prototype._checkIfAllDecrypted = function () {
  */
 Decrypter.prototype._decryptPost = function (post, key, mode) {
 	// Actual Decryption
+	if ((post.body.length % 2) != 0) {
+		post.body = post.body + "0";
+	}
 	if (post.isHex()) { // Final check before we send it to the decrypter
+
 		var work = {
 			task: "decrypt",
 			buffer: new Buffer(post.body,"hex"),
@@ -171,7 +175,7 @@ Decrypter.prototype._decryptPost = function (post, key, mode) {
 		var self = this;
 		this.threader.sendWork(work).then(function (decryptedResponse) { 
 			self._amountDecrypted++;
-			self.emit("decrypt", {post: post, decryptionResult: decryptedResponse.result });
+			self.emit("decrypt", {post: post, decryptionResult: decryptedResponse.result, key: key });
 			self._checkIfAllDecrypted();
 		}, function (err) {
 			self._amountDecrypted++;
@@ -180,7 +184,7 @@ Decrypter.prototype._decryptPost = function (post, key, mode) {
 		});
 	}
 	else {
-		throw "Post is not hex encoded";
+		throw "Post is not hex encoded " + post.body.length;
 	}
 };
 

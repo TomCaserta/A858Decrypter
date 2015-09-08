@@ -15,20 +15,28 @@
   "author": "Tom Caserta <tom@caserta.co.uk> (http://tom.caserta.co.uk/)",
   "license": "MIT",
   "bin": {
-    "massdecrypt": "./cli/decrypt.js",
-    "dumpdecrypt": "./cli/dumpdecrypt.js",
-    "ivhelper": "./cli/ivhelper.js",
-    "searchposts": "./cli/searchposts.js",
-    "transformkeys": "./cli/transformkeys.js",
-    "updateposts": "./cli/update.js"
+    "massdecrypt": "./cli/decrypt.js"
   },
   "bugs": {
     "url": "https://github.com/TomCaserta/A858Decrypter/issues"
   },
   "dependencies": {
+    "better-console": "^0.2.4",
     "command-line-args": "^1.0.0",
     "csv-parser": "^1.7.0",
+    "del": "^2.0.1",
+    "extend": "^3.0.0",
     "progress": "^1.1.8",
-    "promise": "^7.0.4"
-  }
+    "promise": "^7.0.4",
+    "single-line-log": "^1.0.0"
+  },
+  "directories": {
+    "test": "tests"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TomCaserta/A858Decrypter.git"
+  },
+  "homepage": "https://github.com/TomCaserta/A858Decrypter#readme"
 }

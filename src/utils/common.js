@@ -1,9 +1,17 @@
 var ProgressBar = require("progress");
 var Promise = require("promise");
+var fs = require("fs");
+
+// Denodify
+var readFile = Promise.denodeify(fs.readFile);
+var writeFile = Promise.denodeify(fs.writeFile);
+var statFile = Promise.denodeify(fs.stat);
 
 function Utils () {
 	throw "Utils is a static object";
 }
+
+
 
 /**
  * Strips new lines, spaces and control feeds from the data.
@@ -23,7 +31,7 @@ Utils.isHex = function (hex) {
 	if (hex instanceof Buffer) {
 		hex = buffer.toString("ascii");
 	}
-	return /[0-9A-F]/i.test(hex);
+	return /^[0-9A-F]+?$/ig.test(hex);
 };
 
 /**
@@ -33,9 +41,18 @@ Utils.isHex = function (hex) {
  * @return {[type]}
  */
 Utils.scoreRelevance = function (hex) {
-	if (!hex instanceof Buffer) {
-		// TODO: Score Relevance Function
+	if (!(hex instanceof Buffer)) {
+		hex = new Buffer(hex, "hex");
 	}
+	var unicode = hex.toString("utf8");
+	var score = unicode.length;
+	for (var i = 0; i <= unicode.length; i++) {
+		var uChar = unicode.charCodeAt(i);
+		if (uChar > 255) {
+			score--;
+		}
+	}
+	return score / unicode.length;
 };
 
 /**
@@ -46,7 +63,7 @@ Utils.scoreRelevance = function (hex) {
  */
 Utils.createProgressBar = function (displayName, totalLength) {
 	//console.log(displayName, totalLength);
-	return new ProgressBar(pad(displayName, 30, " ")+' :bar :etaS ', { 
+	return new ProgressBar(Utils.pad(displayName, 30, " ")+' :bar :etaS ', { 
 		total: totalLength,
 		complete: "█",
 		incomplete: "░",
@@ -63,23 +80,31 @@ Utils.createProgressBar = function (displayName, totalLength) {
  */
 Utils.readFileWithProgress = function (fileName, displayName, pipeTo) {
 	return new Promise(function (resolve, reject) { 
-		//console.log("Promise called");
+		////console.log("Promise called");
 		statFile(fileName).then(function (fileStats) {
+			//console.log("Statted");
 			var size = fileStats["size"];
-			//console.log("Reading progress");
-			var progressBar = createProgressBar(displayName, size);
+			////console.log("Reading progress");
+			//console.log(size);
+			var progressBar = Utils.createProgressBar(displayName, size);
+			//console.log("Progress bar created");
 			progressBar.tick(0);
 			var file = "";
 			var readStream = fs.createReadStream(fileName);
+			//console.log("Got past readstream");
 			if (pipeTo != null) {
 				readStream = readStream.pipe(pipeTo());
 			}
+			//console.log("Reading for real now...");
 			readStream.on("data", function(chunk) {
+				//console.log("++");
 				progressBar.tick(chunk.length);
 				file += chunk;
 			}).on("end", function() {
+				//console.log("finished");
 				resolve(file);
 			}).on("error", function (error) { 
+				//console.error(error);
 				reject(error);
 			});
 		}, function (err) { 
@@ -111,8 +136,8 @@ Utils.histogram = function (hex) {
 		hex = new Buffer(hex, "ascii");
 	}
 	var result = {};
-	for (var i = 0; i < data.length; i++) {
-		var databyte = data[i];
+	for (var i = 0; i < hex.length; i++) {
+		var databyte = hex[i];
 		if (!result.hasOwnProperty(databyte)) {
 			result[databyte] = 0;
 		}
@@ -136,13 +161,13 @@ Utils.getStandardDeviation = function (hex, histogram) {
 		histogram = Utils.histogram(hex);
 	}
 
-	var n = data.length;
+	var n = hex.length;
 	var p = 1 / 256.0;
 	var	expected = n * p;
 	var stddev = Math.sqrt(n * p * (1 - p));
 	var biggestDiff = 0;
-	for (var prop in dist) {
-		var d = dist[prop];
+	for (var prop in histogram) {
+		var d = histogram[prop];
 
 		var diff = Math.abs(expected - d);
 		if (diff > biggestDiff) {

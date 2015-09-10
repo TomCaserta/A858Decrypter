@@ -1,16 +1,18 @@
 # A858 Decrypter
 
 Usage:
+
     $ npm install -g a858decrypter
     $ massdecrypt --in-file all_posts.csv --key-file keys.txt --key-transform md5 --key-transform dehex --keyiv 0 --modes des-ede 
 
 The mass decrypt cli application will then attempt all keys inside of the keys.txt, perform the transforms,
- load in the post list and then perform the decryption and output them to the files. 
+load in the post list and then perform the decryption and output them to the files. 
 
- This command may seem long winded however there are some sensible defaults which are explained below. Sometimes you may want to be specific with what you are doing so you can be sure you have properly tried a decryption key.
+This command may seem long winded however there are some sensible defaults which are explained below. Sometimes you may want to be specific with what you are doing so you can be sure you have properly tried a decryption key.
 
 # Command Information
 
+```
   A858 Decrypter
   Decrypts A858 posts based on a key list and cipher modes.
 
@@ -75,16 +77,17 @@ The mass decrypt cli application will then attempt all keys inside of the keys.t
                                    want to dehex.
 
   Project home: https://github.com/TomCaserta/A858Decrypter ReadMe: https://github.com/TomCaserta/A858Decrypter/README.MD
+```
 
-  # Key Transformations
+# Key Transformations
 
-  Transforms can be made to keys by specifying the -t switch. You can have multiple transforms done to a key in the key file.
+Transforms can be made to keys by specifying the -t switch. You can have multiple transforms done to a key in the key file.
 
-  All of these transforms will be performed on the key in order they appear in the command. It will not modify the original file however the new key will be used for decryption.
+All of these transforms will be performed on the key in order they appear in the command. It will not modify the original file however the new key will be used for decryption.
 
-  # TODO
+# TODO
 
-  * Properly implement post pre-processors
-  * Implement errors file
-  * Optimise the testing of keys, currently when each new key is attempted. Each post is serialised with that key when sent to the decrypter thread. This is highly inefficient and makes it impossible to use large key lists.
-  * Properly implement an API so the functionality can be extended
+* Properly implement post pre-processors
+* Implement errors file
+* Optimise the testing of keys, currently when each new key is attempted. Each post is serialised with that key when sent to the decrypter thread. This is highly inefficient and makes it impossible to use large key lists.
+* Properly implement an API so the functionality can be extended

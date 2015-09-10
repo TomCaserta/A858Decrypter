@@ -1,6 +1,6 @@
 {
   "name": "a858decrypt",
-  "version": "0.0.0",
+  "version": "0.0.2",
   "description": "A library and CLI program designed to test keys and encryption methods against posts made by A858",
   "main": "main.js",
   "scripts": {

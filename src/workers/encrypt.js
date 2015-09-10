@@ -13,6 +13,7 @@ function encrypt (buffer, key, algorithm, iv) {
 	var cipherer;
 	if (key instanceof Array) {
 		key = new Buffer(key);
+		iv = new Buffer([]);
 	}
 	if (!iv) {
 		 cipherer = crypto.createCipher(algorithm, key);

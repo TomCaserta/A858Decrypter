@@ -11,7 +11,7 @@ var PostPreprocessor = require("../utils/post_preprocessor.js");
 function Post (name, time, body, url) {
 	this.name = name;
 	this.time = time;
-	this.body = Utils.sanitizeData(body);
+	this.body = Utils.sanitizeData(body);// + "5DACFFBA8FF64DBD");
 	this.url = url;
 	this._isHex = Utils.isHex(this.body);
 }

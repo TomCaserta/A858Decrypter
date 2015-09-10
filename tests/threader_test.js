@@ -25,13 +25,19 @@ fs.createReadStream("./all.csv").pipe(csv({
 			var pl = post.body.length;
 			for (var i = 0; i < pl; i+=16) {
 				var key = post.body.substr(i, 16);
-				var work = {
-					task: "encrypt",
-					key: key.toLowerCase()
-				};
-				n++;
-				worklist.push(work);
-
+				if (key.length == 16) {
+				try {
+					var work = {
+						task: "encrypt",
+						key: key
+					};
+					n++;
+					worklist.push(work);
+				}
+				catch (e) {
+					throw key + " is not fucking hex?";
+				}
+				}
 
 			}
 		}

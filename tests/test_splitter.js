@@ -27,9 +27,10 @@ fs.createReadStream("./all.csv").pipe(csv({
 			if (name <= 201107031600) {
 				for (var i = 0; i < pl; i+=32) {
 					var key = post.body.substr(i, 32);
-					if (key.substr(13,1) != "4") {
+					//89f46b80f8974
+					if (key.substr(12,1) == "4") {
 						//worklist.push(key);
-						worklist.push(key.substr(0,16));
+						worklist.push(key.substr(0,32));
 					}
 
 				}

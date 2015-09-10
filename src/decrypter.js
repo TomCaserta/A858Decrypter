@@ -12,10 +12,12 @@ var util   = require('util');
  * @param {PostList} The posts that should be decrypted
  * @param {array} The cipher modes to use for decryption
  */
-function Decrypter (posts, keys, modes, workers) {
+function Decrypter (posts, keys, modes, workers, keyIV) {
+	console.log(keyIV);
   	events.EventEmitter.call(this);
   	// TODO: Make immutable.
 	this.keys = keys;
+	this.keyIV = keyIV;
 	this.posts = posts;
 	this.modes = modes;
 	this.threader = new Threader(workers, "./src/workers/decrypt.js");
@@ -64,17 +66,16 @@ Decrypter.prototype.decrypt = function () {
 		this._reset(); // Just in case
 
 		this.threader.startUp();
-
+		var self = this;
 		// Lock the decrypt event to ensure you cant attempt to paralell decrypt
 		// with the same object
-		this._isDecrypting = true; 
+		self._isDecrypting = true; 
 
 		// Calculate the process amount as to know when decryption is finished
-		this._calculateProcessAmount();
+		self._calculateProcessAmount();
 
 		// Loop through posts to decrypt
-		var self = this;
-		this.posts.forEach(function (post) {
+		self.posts.forEach(function (post) {
 			if (post.isHex()) {
 				self._decryptPostWithKeys(post, self.keys, self.modes);
 			}
@@ -170,6 +171,7 @@ Decrypter.prototype._decryptPost = function (post, key, mode) {
 			task: "decrypt",
 			buffer: new Buffer(post.body,"hex"),
 			key: key,
+			keyIV: this.keyIV,
 			algorithm: mode
 		};
 		var self = this;

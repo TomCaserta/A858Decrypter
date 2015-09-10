@@ -51,6 +51,7 @@ var api = {
 };
 
 var cli = commandLineArgs([
+	{ name: "keyiv", alias: "n", description: "Number of null bytes to use for a null IV to allow for unknown IV raw key decryption.", type: Number },
 	{ name: "help", alias: "h", description: "Show this usage information"},
     { name: "preprocessor", alias: "p", defaultValue: defaults["preprocessor"], multiple: true, type: String,  description: "Specifies javascript files of which exports a function that pre-processes the post data into keys, ivs or mutates the post. View the API to see what you can do at the GitHub project." },
     { name: "out-ascii", alias: "o", defaultValue: defaults["out-ascii"], type: String,  description: "File to place ASCII encoded output" },
@@ -143,7 +144,11 @@ fs.createReadStream(commands["in-file"]).pipe(csv({
 });
 
 function decryptPosts (posts, keys, modes) {	
-	var decrypter = new Decrypter(posts, keys, modes, 8);
+	var nIV = null;
+	if (commands.hasOwnProperty("keyiv")) {
+		nIV = commands["keyiv"];
+	}
+	var decrypter = new Decrypter(posts, keys, modes, 8, nIV);
 	console.log("Decrypting "+posts.getLength()+" posts with "+keys.getLength()+" keys and the following modes: "+modes.join(", ")+". Totalling "+decrypter.getProcessAmount()+" operations (hex encoded posts only) \n")
 	try {
 		if (decrypter.getProcessAmount() > 50000) {
@@ -182,7 +187,7 @@ function decryptPosts (posts, keys, modes) {
 function outputSuccesful (success) {
 	try {
 		var sortFn = function (pa, pb) {
-			return pa.score - pb.score;
+			return pb.score - pa.score;
 		};
 		var successSorted = success.sort(sortFn);
 		var ASCII = [];
@@ -198,13 +203,19 @@ function outputSuccesful (success) {
 			}
 		});
 		var mappedRes = ASCII.map(function (decData) { 
-			return "#"+decData.post.name+"\n\nLink: "+decData.post.url+"\n\n Score: "+decData.score+"\n\n Std Devs: "+Utils.getStandardDeviation(decData.decryptionResult)+"\n\n Key: "+decData.key.key +" \n\n Final Block: "+decData.post.body.substr(decData.post.body.length - 16, decData.post.body.length)+"\n\nIV: "+decData.key.iv+"\n\n #Decoded String\n\n    "+decData.decryptionResult.toString("ascii").split("\n").join("\n    ");
+			var decRes = decData.decryptionResult;
+			var decBuffer = Utils.isHex(decRes) ? new Buffer(decRes,"hex") : new Buffer(decRes, "ascii");
+			var stdDev = Utils.getStandardDeviation(decBuffer);
+			return "#"+decData.post.name+"\n\nLink: "+decData.post.url+"\n\n Score: "+decData.score+"\n\n Std Devs: "+ stdDev +"\n\n Key: "+decData.key.key +" \n\n Final Block: "+decData.post.body.substr(decData.post.body.length - 16, decData.post.body.length)+"\n\nIV: "+decData.key.iv+"\n\n #Decoded String\n\n    "+decData.decryptionResult.toString("ascii").split("\n").join("\n    ");
 		});
-		var unicodeRes = UNICODE.map(function (decData) { 
-			return "#"+decData.post.name+"\n\nLink: "+decData.post.url+"\n\n Key: "+decData.key.key +" IV: "+decData.key.iv+"\n\n #Decoded String\n\n    "+decData.decryptionResult.toString("utf8").split("\n").join("\n    ");
+		var unicodeRes = UNICODE.map(function (decData) {  
+			var decRes = decData.decryptionResult;
+			var decBuffer = Utils.isHex(decRes) ? new Buffer(decRes,"hex") : new Buffer(decRes, "ascii");
+			var stdDev = Utils.getStandardDeviation(decBuffer);
+			return "#"+decData.post.name+"\n\nLink: "+decData.post.url+"\n\n Score: "+decData.score+"\n\n Std Devs: "+ stdDev +"\n\n Key: "+decData.key.key +" IV: "+decData.key.iv+"\n\n #Decoded String\n\n    "+decData.decryptionResult.toString("utf8").split("\n").join("\n    ");
 		});
 		fs.writeFileSync(commands["out-ascii"], mappedRes.join("\n\n"));
-		fs.writeFileSync(commands["out-unicode"], unicodeRes.join("\n\n"),0,"utf8");
+		fs.writeFileSync(commands["out-unicode"], unicodeRes.join("\n\n"),0,"ucs2");
 		var csvFile = "";
 		for (var i = 0; i<ASCII.length; i++) {
 			var decData = ASCII[i];

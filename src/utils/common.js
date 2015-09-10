@@ -29,7 +29,7 @@ Utils.sanitizeData = function (body) {
  */
 Utils.isHex = function (hex) {
 	if (hex instanceof Buffer) {
-		hex = buffer.toString("ascii");
+		hex = hex.toString("ascii");
 	}
 	return /^[0-9A-F]+?$/ig.test(hex);
 };
